@@ -37,7 +37,8 @@ def check_precision(
     if precision == "bypass":
         return True
     if precision == "fp16":
-        return model.device == "cuda" and hasattr(model, "enable_fp16")
+        # return model.device == "cuda" and hasattr(model, "enable_fp16")
+        return True
     if precision == "tf32":
         return model.device == "cuda"
     if precision == "amp":

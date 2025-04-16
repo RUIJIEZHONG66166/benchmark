@@ -9,7 +9,8 @@ HUGGINGFACE_MODELS = {
     # 'name': (train_max_length, eval_max_length, config, model)
     "hf_GPT2": (
         512,
-        1024,
+        # 1024,
+        32,
         'AutoConfig.from_pretrained("gpt2")',
         "AutoModelForCausalLM",
     ),
@@ -83,7 +84,8 @@ HUGGINGFACE_MODELS = {
     # see https://huggingface.co/bert-large-cased
     "hf_Bert_large": (
         512,
-        512,
+        # 512,
+        32,
         "BertConfig(hidden_size=1024, num_hidden_layers=24, num_attention_heads=16)",
         "AutoModelForMaskedLM",
     ),

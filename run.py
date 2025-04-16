@@ -22,7 +22,7 @@ from torchbenchmark.util.experiment.instantiator import (
     TorchBenchModelConfig,
 )
 from torchbenchmark.util.experiment.metrics import get_model_flops, get_peak_memory
-
+from context_func import context_func
 
 if not hasattr(torch.version, "git_version"):
     from pytorch.benchmark.fb.run_utils import trace_handler, usage_report_logger
@@ -31,7 +31,8 @@ else:
 
 
 WARMUP_ROUNDS = 3
-SUPPORT_DEVICE_LIST = ["cpu", "cuda"]
+# SUPPORT_DEVICE_LIST = ["cpu", "cuda"]
+SUPPORT_DEVICE_LIST = ["cpu", "cuda", "xpu"]
 if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
     SUPPORT_DEVICE_LIST.append("mps")
 SUPPORT_PROFILE_LIST = [
@@ -91,7 +92,7 @@ def printResultSummaryTime(
     gpu_peak_mem=None,
 ):
     assert model is not None, "model can not be None."
-    if args.device == "cuda":
+    if args.device == "cuda" or args.device == "xpu":
         gpu_time = np.median(list(map(lambda x: x[0], result_summary)))
         cpu_walltime = np.median(list(map(lambda x: x[1], result_summary)))
         print(
@@ -207,6 +208,25 @@ def run_one_step(
             result_summary.append(
                 (start_event.elapsed_time(end_event), (t1 - t0) / 1_000_000)
             )
+        elif args.device == "xpu":
+            torch.xpu.synchronize()
+            start_event = torch.xpu.Event(enable_timing=True)
+            end_event = torch.xpu.Event(enable_timing=True)
+
+            # Collect time_ns() instead of time() which does not provide better precision than 1
+            # second according to https://docs.python.org/3/library/time.html#time.time.
+            with context_func(args.profile_test, args.device, 'none', 'yes') as prof:
+                t0 = time.time_ns()
+                start_event.record()
+                func()
+                end_event.record()
+                torch.xpu.synchronize()
+                t1 = time.time_ns()
+                result_summary.append(
+                    (start_event.elapsed_time(end_event), (t1 - t0) / 1_000_000)
+                )
+                if args.profile_test:
+                    prof.step()
         elif args.device == "mps":
             t0 = time.time_ns()
             func()
@@ -413,6 +433,9 @@ def main() -> None:
     )
     parser.add_argument(
         "--profile", action="store_true", help="Run the profiler around the function"
+    )
+    parser.add_argument(
+        "--profile_test", action="store_true", help="Run the profiler around the function"
     )
     parser.add_argument(
         "--disable-profile-options",
