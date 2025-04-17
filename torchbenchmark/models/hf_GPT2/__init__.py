@@ -1,8 +1,8 @@
 from torchbenchmark.tasks import NLP
-from torchbenchmark.util.framework.huggingface.model_factory import HuggingFaceModel
+from torchbenchmark.util.framework.huggingface.model_factory import HuggingFaceModel, HuggingFaceGenerationModel
 
 
-class Model(HuggingFaceModel):
+class Model(HuggingFaceGenerationModel):
     task = NLP.LANGUAGE_MODELING
     DEFAULT_TRAIN_BSIZE = 4
     DEFAULT_EVAL_BSIZE = 1

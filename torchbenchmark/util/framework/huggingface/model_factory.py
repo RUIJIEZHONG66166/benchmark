@@ -159,7 +159,9 @@ class HuggingFaceGenerationModel(HuggingFaceModel):
         # These params were cribbed off of
         # https://github.com/younesbelkada/hf-torch-compile-benchmark
         generation_config = GenerationConfig(
-            max_new_tokens=256,
+            min_new_tokens=1,
+            max_new_tokens=1,
+            # max_new_tokens=256,
             pad_token_id=0,
             eos_token_id=None,
             do_sample=False,
