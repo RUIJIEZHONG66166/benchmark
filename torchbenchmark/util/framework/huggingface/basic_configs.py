@@ -85,7 +85,7 @@ HUGGINGFACE_MODELS = {
     "hf_Bert_large": (
         512,
         # 512,
-        32,
+        128,
         "BertConfig(hidden_size=1024, num_hidden_layers=24, num_attention_heads=16)",
         "AutoModelForMaskedLM",
     ),
