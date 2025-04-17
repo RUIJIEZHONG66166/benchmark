@@ -199,15 +199,16 @@ def run_one_step(
 
             # Collect time_ns() instead of time() which does not provide better precision than 1
             # second according to https://docs.python.org/3/library/time.html#time.time.
-            t0 = time.time_ns()
-            start_event.record()
-            func()
-            end_event.record()
-            torch.cuda.synchronize()
-            t1 = time.time_ns()
-            result_summary.append(
-                (start_event.elapsed_time(end_event), (t1 - t0) / 1_000_000)
-            )
+            with context_func(args.profile_test, args.device, 'none', 'yes') as prof:
+                t0 = time.time_ns()
+                start_event.record()
+                func()
+                end_event.record()
+                torch.cuda.synchronize()
+                t1 = time.time_ns()
+                result_summary.append(
+                    (start_event.elapsed_time(end_event), (t1 - t0) / 1_000_000)
+                )
         elif args.device == "xpu":
             torch.xpu.synchronize()
             start_event = torch.xpu.Event(enable_timing=True)
