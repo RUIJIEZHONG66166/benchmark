@@ -9,6 +9,7 @@ function main {
     set_environment
 
     # requirements
+    pip install timm
 
     cp oob-common/context_func.py ./
     # if multiple use 'xxx,xxx,xxx'
