@@ -71,7 +71,7 @@ function generate_core {
         fi
         printf " ${OOB_EXEC_HEADER} \
 	        python run.py \
-            ${model_name} \
+            ${MODEL_NAME} \
             -d ${device} --precision ${precision} --bs ${batch_size} \
             ${channels_last} \
             ${addtion_options} \
