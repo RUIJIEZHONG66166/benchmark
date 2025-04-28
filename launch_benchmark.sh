@@ -9,7 +9,8 @@ function main {
     set_environment
 
     # requirements
-    pip install timm
+    pip install timm boto3 doctr dominate effdet fastNLP gym higher kaldi_io matplotlib onnx opacus pycocotools segment_anything_fast tensorboardX torch_geometric unidecode
+    python -m pip install 'git+https://github.com/facebookresearch/detectron2.git'
 
     cp oob-common/context_func.py ./
     # if multiple use 'xxx,xxx,xxx'
