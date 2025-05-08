@@ -13,7 +13,8 @@ function main {
     #python -m pip install 'git+https://github.com/facebookresearch/detectron2.git'
     pip install timm
     pip install --no-deps -r requirements.txt
-    #python install.py --continue_on_fail
+    torchbench_model_name=`echo ${model_name} | cut -d'_' -f2-`
+    python install.py ${torchbench_model_name} --continue_on_fail
 
     cp oob-common/context_func.py ./
     # if multiple use 'xxx,xxx,xxx'
