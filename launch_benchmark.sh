@@ -13,7 +13,7 @@ function main {
     #python -m pip install 'git+https://github.com/facebookresearch/detectron2.git'
     pip install timm
     pip install --no-deps -r requirements.txt
-    python install.py ${model_name} --continue_on_fail
+    python install.py ${MODEL_NAME} --continue_on_fail
 
     cp oob-common/context_func.py ./
     # if multiple use 'xxx,xxx,xxx'
