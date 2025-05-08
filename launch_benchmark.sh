@@ -79,7 +79,7 @@ function generate_core {
         printf " ${OOB_EXEC_HEADER} \
 	        python run.py \
             ${MODEL_NAME} \
-            -d ${device} --precision ${precision} --bs ${batch_size} \
+            -d ${device} --precision ${precision} \
             ${channels_last} \
             ${addtion_options} \
             > ${log_file} 2>&1 &  \n" |tee -a ${excute_cmd_file}
