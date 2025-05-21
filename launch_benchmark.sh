@@ -31,6 +31,9 @@ function main {
             # clean workspace
             logs_path_clean
 
+	    if [[ "${batch_size}" != "-1" ]];then
+                addtion_options+=" --bs ${batch_size} "
+
             # generate launch script for multiple instance
             if [ "${OOB_USE_LAUNCHER}" == "1" ] && [ "${device}" == "cpu" ];then
                 generate_core_launcher
