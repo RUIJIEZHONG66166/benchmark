@@ -22,6 +22,7 @@ function main {
     model_name_list=($(echo "${model_name}" |sed 's/,/ /g'))
     batch_size_list=($(echo "${batch_size}" |sed 's/,/ /g'))
 
+    base_addtion_options=${addtion_options}
     # generate benchmark
     for model_name in ${model_name_list[@]}
     do
@@ -31,7 +32,7 @@ function main {
             # clean workspace
             logs_path_clean
             if [[ "${batch_size}" -gt "0" ]];then
-                addtion_options+=" --bs ${batch_size} "
+                addtion_options=${base_addtion_options}" --bs ${batch_size} "
             fi
 
             # generate launch script for multiple instance
