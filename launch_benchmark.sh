@@ -72,9 +72,9 @@ function generate_core {
         else
             channels_last=""
         fi
-        if [ "${precision}" == "float16" || "${precision}" == "fp16" ];then
+        if [[ "${precision}" == "float16" || "${precision}" == "fp16" ]];then
             precision="fp16"
-        elif [ "${precision}" == "bfloat16" || "${precision}" == "bf16" ];then
+        elif [[ "${precision}" == "bfloat16" || "${precision}" == "bf16" ]];then
             precision="bf16"
         else
             precision="fp32"
