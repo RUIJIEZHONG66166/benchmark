@@ -46,6 +46,7 @@ function main {
             echo -e "Finished.\n\n\n\n"
             # collect launch result
             torchbench_latency=1 collect_perf_logs
+	    sleep 10
         done
     done
 }
