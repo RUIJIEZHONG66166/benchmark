@@ -15,8 +15,6 @@ function main {
     pip install --no-deps -r requirements.txt
     python install.py ${MODEL_NAME} --continue_on_fail
 
-    huggingface-cli login --token ${HUGGINGFACE_TOKEN}
-
     cp oob-common/context_func.py ./
     # if multiple use 'xxx,xxx,xxx'
     model_name_list=($(echo "${model_name}" |sed 's/,/ /g'))
