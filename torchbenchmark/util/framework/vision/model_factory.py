@@ -115,10 +115,8 @@ class TorchVisionModel(BenchmarkModel):
 
     def train(self):
         self.opt.zero_grad()
-        # for data, target in zip(self.example_inputs, self.example_outputs):
         with self.amp_context():
             outputs = self.model(*self.example_inputs)
-        print("11111")
         # breakpoint()
         loss = self.compute_loss(outputs)
         loss.backward()
