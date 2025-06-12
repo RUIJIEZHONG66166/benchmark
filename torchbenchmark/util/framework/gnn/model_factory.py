@@ -16,6 +16,7 @@ from torchbenchmark.tasks import GNN
 from torchbenchmark.util.framework.gnn.config import parse_tb_args
 from torchbenchmark.util.model import BenchmarkModel
 from tqdm import tqdm
+from typing import Any, Callable, Optional, overload, TypeVar, Union
 
 models_dict = {
     "gat": GAT,
@@ -102,7 +103,8 @@ class GNNModel(BenchmarkModel):
 
         if test == "train":
             self.output_generator = self._gen_target()
-            self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
+            # self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
+            self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.01, foreach=True)
             self.loss_fn = torch.nn.CrossEntropyLoss()
             self.model.train()
         elif test == "eval":
@@ -126,16 +128,43 @@ class GNNModel(BenchmarkModel):
             for example_output in self.example_outputs:
                 yield example_output
 
-    def forward(self):
-        pred = self.model(**self.example_inputs)
-        outputs = next(self.output_generator)
+    # def forward(self):
+    #     pred = self.model(**self.example_inputs)
+    #     outputs = next(self.output_generator)
 
-        return self.loss_fn(pred, outputs)
+    #     return self.loss_fn(pred, outputs)
 
-    def backward(self, loss):
+    # def backward(self, loss):
+    #     loss.backward()
+
+    # def optimizer_step(self):
+    #     self.optimizer.step()
+    @overload
+    def compute_loss(self, out: torch.Tensor) -> torch.Tensor: ...
+
+    @overload
+    def compute_loss(self, 
+        out: Union[list[Any], tuple[Any, ...], dict[Any, Any]],
+    ) -> float: ...
+    
+    def compute_loss(self, out: Any) -> Union[torch.Tensor, float]:
+        if isinstance(out, torch.Tensor):
+        # Mean does not work on integer tensors
+            return out.sum() / out.numel()
+        elif isinstance(out, (list, tuple)):
+            return sum(self.compute_loss(x) for x in out) / len(out)
+        elif isinstance(out, dict):
+            return sum(self.compute_loss(value) for value in out.values()) / len(
+                out.keys()
+            )
+        raise NotImplementedError("Don't know how to reduce", type(out))
+
+    def train(self):
+        self.optimizer.zero_grad()
+        with self.amp_context():
+            outputs = self.model(**self.example_inputs)
+        loss = self.compute_loss(outputs)
         loss.backward()
-
-    def optimizer_step(self):
         self.optimizer.step()
 
     def eval(self) -> typing.Tuple[torch.Tensor]:

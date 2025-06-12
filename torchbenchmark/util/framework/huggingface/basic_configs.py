@@ -318,11 +318,13 @@ def download_model(model_name):
 def generate_optimizer_for_model(model, model_name):
     from torch import optim
 
-    if model_name in HUGGINGFACE_MODELS_SGD_OPTIMIZER:
-        return optim.SGD(model.parameters(), lr=0.001)
-    return optim.Adam(
-        model.parameters(),
-        lr=0.001,
-        # TODO resolve https://github.com/pytorch/torchdynamo/issues/1083
-        capturable=bool(int(os.getenv("ADAM_CAPTURABLE", 0))),
-    )
+    # if model_name in HUGGINGFACE_MODELS_SGD_OPTIMIZER:
+    #     return optim.SGD(model.parameters(), lr=0.001)
+    return optim.SGD(
+        model.parameters(), lr=0.001, foreach=True)
+    # return optim.Adam(
+    #     model.parameters(),
+    #     lr=0.001,
+    #     # TODO resolve https://github.com/pytorch/torchdynamo/issues/1083
+    #     capturable=bool(int(os.getenv("ADAM_CAPTURABLE", 0))),
+    # )

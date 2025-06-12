@@ -6,7 +6,7 @@ import torch
 import torch.optim as optim
 from torchbenchmark.util.model import BenchmarkModel
 from torchvision import models
-
+from typing import Any, Callable, Optional, overload, TypeVar, Union
 
 class TorchVisionModel(BenchmarkModel):
     # To recognize this is a torchvision model
@@ -52,7 +52,8 @@ class TorchVisionModel(BenchmarkModel):
                 )
                 else True
             )
-            self.opt = optim.Adam(self.model.parameters(), capturable=capturable)
+            # self.opt = optim.Adam(self.model.parameters(), capturable=capturable)
+            self.opt = torch.optim.SGD(self.model.parameters(), lr=0.01, foreach=True)
             self.loss_fn = torch.nn.CrossEntropyLoss()
         elif test == "eval":
             self.model.eval()
@@ -92,21 +93,50 @@ class TorchVisionModel(BenchmarkModel):
     def get_module(self):
         return self.model, self.example_inputs
 
-    def forward(self):
-        with torch.no_grad():
-            self.example_outputs = (torch.rand_like(self.model(*self.example_inputs)),)
-        for data, target in zip(self.example_inputs, self.example_outputs):
-            # Alexnet returns non-grad tensors in forward pass
-            # Force to call requires_grad_(True) here
-            pred = self.model(data).requires_grad_(True)
-            u = self.loss_fn(pred, target)
-            return u
+    @overload
+    def compute_loss(self, out: torch.Tensor) -> torch.Tensor: ...
 
-    def backward(self, loss):
+    @overload
+    def compute_loss(self, 
+        out: Union[list[Any], tuple[Any, ...], dict[Any, Any]],
+    ) -> float: ...
+    
+    def compute_loss(self, out: Any) -> Union[torch.Tensor, float]:
+        if isinstance(out, torch.Tensor):
+        # Mean does not work on integer tensors
+            return out.sum() / out.numel()
+        elif isinstance(out, (list, tuple)):
+            return sum(self.compute_loss(x) for x in out) / len(out)
+        elif isinstance(out, dict):
+            return sum(self.compute_loss(value) for value in out.values()) / len(
+                out.keys()
+            )
+        raise NotImplementedError("Don't know how to reduce", type(out))
+
+    def train(self):
+        self.opt.zero_grad()
+        with self.amp_context():
+            outputs = self.model(*self.example_inputs)
+        # breakpoint()
+        loss = self.compute_loss(outputs)
         loss.backward()
-
-    def optimizer_step(self):
         self.opt.step()
+
+    # def forward(self):
+    #     with torch.no_grad():
+    #         self.example_outputs = (torch.rand_like(self.model(*self.example_inputs)),)
+    #     for data, target in zip(self.example_inputs, self.example_outputs):
+    #         # Alexnet returns non-grad tensors in forward pass
+    #         # Force to call requires_grad_(True) here
+    #         pred = self.model(data).requires_grad_(True)
+    #         u = self.loss_fn(pred, target)
+    #         return u
+
+    # def backward(self, loss):
+    #     loss.backward()
+
+    # def optimizer_step(self):
+    #     self.opt.step()
 
     def cudagraph_train(self):
         for data, target in zip(self.real_input, self.real_output):

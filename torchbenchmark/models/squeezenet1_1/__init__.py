@@ -25,14 +25,14 @@ class Model(TorchVisionModel):
         )
         self.epoch_size = 16
 
-    def train(self):
-        optimizer = optim.Adam(self.model.parameters())
-        loss = torch.nn.CrossEntropyLoss()
-        optimizer.zero_grad()
-        for _ in range(self.epoch_size):
-            pred = self.model(*self.example_inputs)
-            y = torch.empty(
-                pred.shape[0], dtype=torch.long, device=self.device
-            ).random_(pred.shape[1])
-            loss(pred, y).backward()
-        optimizer.step()
+    # def train(self):
+    #     optimizer = optim.Adam(self.model.parameters())
+    #     loss = torch.nn.CrossEntropyLoss()
+    #     optimizer.zero_grad()
+    #     for _ in range(self.epoch_size):
+    #         pred = self.model(*self.example_inputs)
+    #         y = torch.empty(
+    #             pred.shape[0], dtype=torch.long, device=self.device
+    #         ).random_(pred.shape[1])
+    #         loss(pred, y).backward()
+    #     optimizer.step()
