@@ -199,7 +199,7 @@ def run_one_step(
 
             # Collect time_ns() instead of time() which does not provide better precision than 1
             # second according to https://docs.python.org/3/library/time.html#time.time.
-            with context_func(args.profile_test, args.device, 'none', 'yes') as prof:
+            with context_func(args.profile_test, args.model, args.test, args.device, 'none', 'yes') as prof:
                 t0 = time.time_ns()
                 #start_event.record()
                 func()
@@ -217,7 +217,7 @@ def run_one_step(
 
             # Collect time_ns() instead of time() which does not provide better precision than 1
             # second according to https://docs.python.org/3/library/time.html#time.time.
-            with context_func(args.profile_test, args.device, 'none', 'yes') as prof:
+            with context_func(args.profile_test, args.model, args.test, args.device, 'none', 'yes') as prof:
                 t0 = time.time_ns()
                 #start_event.record()
                 func()
