@@ -444,6 +444,9 @@ def main() -> None:
         "--compile", action="store_true", help="Run the torch.compile mode"
     )
     parser.add_argument(
+        "--enable_compile_cudagraph", action="store_true", help="Run the torch.compile mode with cudagraph"
+    )
+    parser.add_argument(
         "--disable-profile-options",
         type=_validate_profile_options,
         help=f"Select which profile options to disable. Valid options: {SUPPORT_PROFILE_LIST}.",
@@ -541,7 +544,10 @@ def main() -> None:
     elif m.opt_args.backend:
         mode = f"{m.opt_args.backend}"
     elif args.compile:
-        m.model = torch.compile(m.model)
+        if args.enable_compile_cudagraph:
+            m.model = torch.compile(m.model, mode="max-autotune", fullgraph=True,)
+        else:
+            m.model = torch.compile(m.model)
         mode = "compile"
     else:
         mode = "eager"
