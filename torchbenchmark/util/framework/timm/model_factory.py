@@ -47,8 +47,15 @@ class TimmModel(BenchmarkModel):
 
         self.cfg = TimmConfig(model=self.model, device=device)
         self.example_inputs = self._gen_input(self.batch_size)
-
         self.model.to(device=self.device)
+        if self.opt_args.backend == "cudagraph":
+            with torch.no_grad():
+                with torch.autocast(self.device):
+                    self.example_outputs = torch.rand_like(self.model(self.example_inputs))
+        if hasattr(self.opt_args, "backend") and self.opt_args.backend == "cudagraph":
+            self.real_input = (torch.rand_like(self.example_inputs[0]),)
+            self.real_output = (torch.rand_like(self.example_outputs),)
+
         if test == "train":
             self.model.train()
         elif test == "eval":
@@ -110,6 +117,20 @@ class TimmModel(BenchmarkModel):
         with self.amp_context():
             out = self._step_eval()
         return (out,)
+
+    def cudagraph_train(self):
+        for data, target in zip(self.real_input, self.real_output):
+            self.example_inputs[0].copy_(data)
+            self.example_outputs.copy_(target)
+            self.g.replay()
+
+    def cudagraph_eval(self):
+        for data, target in zip(self.real_input, self.real_output):
+            self.example_inputs[0].copy_(data)
+            self.example_outputs.copy_(target)
+            self.g.replay()
+            break
+        return (self.example_outputs,)
 
 
 class ExtendedTimmModel(TimmModel):

@@ -35,9 +35,10 @@ class TorchVisionModel(BenchmarkModel):
         self.example_inputs = (
             torch.randn((self.batch_size, 3, 224, 224)).to(self.device),
         )
-        with torch.no_grad():
-            with torch.autocast(self.device):
-                self.example_outputs = torch.rand_like(self.model(*self.example_inputs))
+        if self.opt_args.backend == "cudagraph":
+            with torch.no_grad():
+                with torch.autocast(self.device):
+                    self.example_outputs = torch.rand_like(self.model(*self.example_inputs))
         if test == "train":
             # compute loss
             with torch.no_grad():
