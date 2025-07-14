@@ -32,6 +32,9 @@ function main {
             if [[ "${batch_size}" -gt "0" ]];then
                 addtion_options=${base_addtion_options}" --bs ${batch_size} "
             fi
+            if [[ "${mode_name}" == "train" ]];then
+                addtion_options=${addtion_options}" --test train "
+            fi
 
             # generate launch script for multiple instance
             if [ "${OOB_USE_LAUNCHER}" == "1" ] && [ "${device}" == "cpu" ];then
