@@ -545,7 +545,7 @@ def main() -> None:
         mode = f"{m.opt_args.backend}"
     elif args.compile:
         if args.enable_compile_cudagraph:
-            m.model = torch.compile(m.model, mode="max-autotune", fullgraph=True,)
+            m.model = torch.compile(m.model, mode="max-autotune")
         else:
             m.model = torch.compile(m.model)
         mode = "compile"
