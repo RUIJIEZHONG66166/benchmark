@@ -106,43 +106,43 @@ class HuggingFaceModel(BenchmarkModel):
         )
         yield next(generator)
 
-    # def forward(self):
-    #     with self.amp_context():
-    #         outputs = self.model(**self.example_inputs)
-    #     return outputs.loss
-
-    # def backward(self, losses):
-    #     losses.backward()
-
-    # def optimizer_step(self):
-    #     self.optimizer.step()
-
-    @overload
-    def compute_loss(self, out: torch.Tensor) -> torch.Tensor: ...
-
-    @overload
-    def compute_loss(self, 
-        out: Union[list[Any], tuple[Any, ...], dict[Any, Any]],
-    ) -> float: ...
-    
-    def compute_loss(self, out: Any) -> Union[torch.Tensor, float]:
-        if isinstance(out, torch.Tensor):
-        # Mean does not work on integer tensors
-            return out.sum() / out.numel()
-        elif isinstance(out, (list, tuple)):
-            return sum(self.compute_loss(x) for x in out) / len(out)
-        elif isinstance(out, dict):
-            return sum(self.compute_loss(value) for value in out.values()) / len(
-                out.keys()
-            )
-        raise NotImplementedError("Don't know how to reduce", type(out))
-    
-    def train(self):
+    def forward(self):
         with self.amp_context():
             outputs = self.model(**self.example_inputs)
-        loss = self.compute_loss(outputs)
-        loss.backward()
+        return outputs.loss
+
+    def backward(self, losses):
+        losses.backward()
+
+    def optimizer_step(self):
         self.optimizer.step()
+
+    # @overload
+    # def compute_loss(self, out: torch.Tensor) -> torch.Tensor: ...
+
+    # @overload
+    # def compute_loss(self, 
+    #     out: Union[list[Any], tuple[Any, ...], dict[Any, Any]],
+    # ) -> float: ...
+    
+    # def compute_loss(self, out: Any) -> Union[torch.Tensor, float]:
+    #     if isinstance(out, torch.Tensor):
+    #     # Mean does not work on integer tensors
+    #         return out.sum() / out.numel()
+    #     elif isinstance(out, (list, tuple)):
+    #         return sum(self.compute_loss(x) for x in out) / len(out)
+    #     elif isinstance(out, dict):
+    #         return sum(self.compute_loss(value) for value in out.values()) / len(
+    #             out.keys()
+    #         )
+    #     raise NotImplementedError("Don't know how to reduce", type(out))
+    
+    # def train(self):
+    #     with self.amp_context():
+    #         outputs = self.model(**self.example_inputs)
+    #     loss = self.compute_loss(outputs)
+    #     loss.backward()
+    #     self.optimizer.step()
 
     def eval(self) -> Tuple[torch.Tensor]:
         with self.amp_context():
