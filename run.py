@@ -193,6 +193,12 @@ def run_one_step(
     first_print_out = True
     while (not stress and _i < num_iter) or (stress and cur_time < target_time):
         if args.device == "cuda":
+            if args.disable_cuda_sdpa:
+                print("Disable sdpa for cuda")
+                torch.backends.cuda.enable_cudnn_sdp(False)
+                torch.backends.cuda.enable_flash_sdp(False)
+                torch.backends.cuda.enable_mem_efficient_sdp(False)
+                torch.backends.cuda.enable_math_sdp(True)
             torch.cuda.synchronize()
             #start_event = torch.cuda.Event(enable_timing=True)
             #end_event = torch.cuda.Event(enable_timing=True)
@@ -211,6 +217,10 @@ def run_one_step(
                     ((t1 - t0) / 1_000_000, (t1 - t0) / 1_000_000)
                 )
         elif args.device == "xpu":
+            if args.disable_xpu_sdpa:
+                print("Disable sdpa for xpu")
+                torch._C._set_sdp_use_overrideable(False)
+                torch._C._set_sdp_use_flash(False)
             torch.xpu.synchronize()
             #start_event = torch.xpu.Event(enable_timing=True)
             #end_event = torch.xpu.Event(enable_timing=True)
@@ -442,6 +452,12 @@ def main() -> None:
     )
     parser.add_argument(
         "--compile", action="store_true", help="Run the torch.compile mode"
+    )
+    parser.add_argument(
+        "--disable_xpu_sdpa", action="store_true", help="Disable sdpa for xpu"
+    )
+    parser.add_argument(
+        "--disable_cuda_sdpa", action="store_true", help="Disable sdpa for cuda"
     )
     parser.add_argument(
         "--enable_compile_cudagraph", action="store_true", help="Run the torch.compile mode with cudagraph"
