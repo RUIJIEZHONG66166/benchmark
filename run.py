@@ -29,7 +29,8 @@ if not hasattr(torch.version, "git_version"):
 else:
     usage_report_logger = lambda: None
 
-
+CURRENT_ITER = -1
+TOTAL_ITERS = 0
 WARMUP_ROUNDS = 3
 # SUPPORT_DEVICE_LIST = ["cpu", "cuda"]
 SUPPORT_DEVICE_LIST = ["cpu", "cuda", "xpu"]
@@ -191,7 +192,10 @@ def run_one_step(
     _i = 0
     last_it = 0
     first_print_out = True
+    global CURRENT_ITER, TOTAL_ITERS
+    TOTAL_ITERS = num_iter
     while (not stress and _i < num_iter) or (stress and cur_time < target_time):
+        CURRENT_ITER = _i
         if args.device == "cuda":
             if args.disable_cuda_sdpa:
                 print("Disable sdpa for cuda")
