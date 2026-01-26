@@ -458,6 +458,9 @@ def main() -> None:
         "--compile", action="store_true", help="Run the torch.compile mode"
     )
     parser.add_argument(
+        "--check_nan", action="store_true", help="check if output or loss is nan"
+    )
+    parser.add_argument(
         "--disable_xpu_sdpa", action="store_true", help="Disable sdpa for xpu"
     )
     parser.add_argument(
@@ -559,6 +562,8 @@ def main() -> None:
     )
     model_flops = get_model_flops(config) if "model_flops" in metrics_needed else None
     m = load_model(config)
+    if args.check_nan:
+        torch.autograd.set_detect_anomaly(True, check_nan=True)
     if m.dynamo:
         mode = f"dynamo {m.opt_args.torchdynamo}"
     elif m.opt_args.backend:
