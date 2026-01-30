@@ -394,9 +394,9 @@ class BenchmarkModel(metaclass=PostInitProcessor):
                     losses = self.forward()
                 with nested(*self.backward_contexts):
                     self.backward(losses)
-                if optimizer is not None:
-                    with nested(*self.optimizer_contexts):
-                        self.optimizer_step()
+                # if optimizer is not None:
+                #     with nested(*self.optimizer_contexts):
+                #         self.optimizer_step()
         return None
 
     def invoke(self) -> Optional[Tuple[torch.Tensor]]:
