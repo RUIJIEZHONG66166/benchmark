@@ -81,10 +81,6 @@ class Model(BenchmarkModel):
 
     def eval(self):
         self.model.eval()
-        out = self.model.generate(
-            *self.example_inputs,
-            self.generate_config.max_new_tokens,
-            self.generate_config.temperature,
-            self.generate_config.top_k,
-        )
+        with torch.no_grad():
+            out = self.model(*self.example_inputs)
         return (out,)
