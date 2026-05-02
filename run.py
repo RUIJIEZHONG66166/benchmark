@@ -170,6 +170,7 @@ def run_one_step(
 ):
     # Warm-up `nwarmup` rounds
     for _i in range(nwarmup):
+        print(f"========== WARMUP {_i+1}/{nwarmup} ==========")
         func()
 
     result_summary = []
@@ -197,6 +198,7 @@ def run_one_step(
     TOTAL_ITERS = num_iter
     while (not stress and _i < num_iter) or (stress and cur_time < target_time):
         CURRENT_ITER = _i
+        print(f"========== ITER {_i+1}/{num_iter} ==========")
         if args.device == "cuda":
             if args.disable_cuda_sdpa:
                 print("Disable sdpa for cuda")
