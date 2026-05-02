@@ -11,6 +11,7 @@ Wall time provided for sanity but is not a sane benchmark measurement.
 
 import argparse
 import time
+import os
 from functools import partial
 
 import numpy as np
@@ -232,12 +233,17 @@ def run_one_step(
             # Collect time_ns() instead of time() which does not provide better precision than 1
             # second according to https://docs.python.org/3/library/time.html#time.time.
             with context_func(args.profile_test, args.model, args.test, args.device, 'none', 'yes') as prof:
+                # Unitrace conditional collection: only collect last iteration
+                if os.environ.get("UNITRACE_LAST_ITER") and _i == num_iter - 1:
+                    os.environ["PTI_ENABLE_COLLECTION"] = "1"
                 t0 = time.time_ns()
                 #start_event.record()
                 func()
                 #end_event.record()
                 torch.xpu.synchronize()
                 t1 = time.time_ns()
+                if os.environ.get("UNITRACE_LAST_ITER") and _i == num_iter - 1:
+                    os.environ["PTI_ENABLE_COLLECTION"] = "0"
                 result_summary.append(
                     #(start_event.elapsed_time(end_event), (t1 - t0) / 1_000_000)
                     ((t1 - t0) / 1_000_000, (t1 - t0) / 1_000_000)
