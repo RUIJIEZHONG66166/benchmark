@@ -69,6 +69,10 @@ function generate_core {
             OOB_EXEC_HEADER=" CUDA_VISIBLE_DEVICES=${device_array[i]} "
         elif [ "${device}" == "xpu" ];then
             OOB_EXEC_HEADER=" ZE_AFFINITY_MASK=${i} "
+            if [ "${OOB_USE_UNITRACE}" == "1" ]; then
+                unitrace_path="${HOME}/pti-gpu/tools/unitrace/build/unitrace"
+                OOB_EXEC_HEADER+=" UNITRACE_LAST_ITER=1 ${unitrace_path} --chrome-kernel-logging --start-paused "
+            fi
 	      fi
         if [ "${channels_last}" == "1" ];then
             channels_last="--channels-last"
