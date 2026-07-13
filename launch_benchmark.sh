@@ -14,8 +14,8 @@ function main {
     python -m pip install timm
     python -m pip install --no-deps -r requirements.txt
     python -m pip install -U pip wheel setuptools==81.0.0
-    python -m pip install --no-deps -U timm
     python install.py ${MODEL_NAME} --continue_on_fail
+    python -m pip install --no-deps -U timm
 
     cp oob-common/context_func.py ./
     # if multiple use 'xxx,xxx,xxx'
