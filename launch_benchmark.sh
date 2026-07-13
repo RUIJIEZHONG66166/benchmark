@@ -11,10 +11,10 @@ function main {
     # requirements
     #pip install timm boto3 doctr dominate effdet fastNLP gym higher kaldi_io matplotlib onnx opacus pycocotools segment_anything_fast tensorboardX torch_geometric unidecode
     #python -m pip install 'git+https://github.com/facebookresearch/detectron2.git'
-    pip install timm
-    pip install --no-deps -r requirements.txt
-    pip install -U pip wheel setuptools==81.0.0
-    pip install -U timm
+    python -m pip install timm
+    python -m pip install --no-deps -r requirements.txt
+    python -m pip install -U pip wheel setuptools==81.0.0
+    python -m pip install --no-deps -U timm
     python install.py ${MODEL_NAME} --continue_on_fail
 
     cp oob-common/context_func.py ./
