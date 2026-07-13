@@ -14,6 +14,7 @@ function main {
     pip install timm
     pip install --no-deps -r requirements.txt
     pip install -U pip wheel setuptools==81.0.0
+    pip install -U timm
     python install.py ${MODEL_NAME} --continue_on_fail
 
     cp oob-common/context_func.py ./
