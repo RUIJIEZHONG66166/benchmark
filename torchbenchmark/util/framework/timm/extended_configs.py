@@ -25,8 +25,23 @@ with open(MODELS_FILENAME) as fh:
         TIMM_MODELS[model_name] = int(batch_size)
 
 
+# Batch size for timm models that are not listed in timm_models_list.txt
+DEFAULT_TIMM_BATCH_SIZE = 128
+
+
 def is_extended_timm_models(model_name: str) -> bool:
-    return model_name in TIMM_MODELS
+    if model_name in TIMM_MODELS:
+        return True
+    try:
+        import timm
+    except ImportError:
+        return False
+    # Also accepts names carrying a pretrained tag, e.g. deit_tiny_patch16_224.fb_in1k
+    return timm.is_model(model_name)
+
+
+def get_timm_batch_size(model_name: str) -> int:
+    return TIMM_MODELS.get(model_name, DEFAULT_TIMM_BATCH_SIZE)
 
 
 def list_extended_timm_models() -> List[str]:

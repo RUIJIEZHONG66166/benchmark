@@ -5,7 +5,7 @@ import timm
 import torch
 from torchbenchmark.util.model import BenchmarkModel
 
-from .extended_configs import BATCH_SIZE_DIVISORS, TIMM_MODELS
+from .extended_configs import BATCH_SIZE_DIVISORS, get_timm_batch_size
 from .timm_config import TimmConfig
 
 # No pretrained weights exist for specific TIMM models
@@ -143,7 +143,7 @@ class ExtendedTimmModel(TimmModel):
     ]
 
     def __init__(self, test, device, batch_size=None, extra_args=[]):
-        recorded_batch_size = TIMM_MODELS[self.name]
+        recorded_batch_size = get_timm_batch_size(self.name)
         if self.name in BATCH_SIZE_DIVISORS:
             recorded_batch_size = max(
                 int(recorded_batch_size / BATCH_SIZE_DIVISORS[self.name]), 1
