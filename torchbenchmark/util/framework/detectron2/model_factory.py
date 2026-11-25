@@ -3,8 +3,11 @@ import os
 from pathlib import Path
 
 import torch
+from torchbenchmark.util.framework.detectron2 import ensure_torch_jit_script
 from torchbenchmark.util.framework.detectron2.config import parse_tb_args
 from torchbenchmark.util.model import BenchmarkModel
+
+ensure_torch_jit_script()
 
 # setup environment variable
 CURRENT_DIR = Path(os.path.dirname(os.path.realpath(__file__)))
