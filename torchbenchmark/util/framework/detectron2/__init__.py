@@ -61,6 +61,26 @@ def pip_install_requirements_detectron2():
     )
 
 
+def ensure_torch_jit_script():
+    """
+    fvcore/detectron2 call `torch.jit.script` at import time, but recent PyTorch removed
+    the public TorchScript APIs (https://github.com/pytorch/pytorch/pull/203621).
+    Restore it from the internal implementation, or fall back to a no-op.
+    """
+    import torch
+
+    if hasattr(torch.jit, "script"):
+        return
+    try:
+        from torch.jit._script import script
+    except ImportError:
+
+        def script(obj, *args, **kwargs):
+            return obj
+
+    torch.jit.script = script
+
+
 # This is to workaround https://github.com/facebookresearch/detectron2/issues/3934
 def remove_tools_directory():
     try:

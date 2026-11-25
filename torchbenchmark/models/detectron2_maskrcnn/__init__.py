@@ -4,6 +4,9 @@ from pathlib import Path
 from typing import Tuple
 
 import torch
+from torchbenchmark.util.framework.detectron2 import ensure_torch_jit_script
+
+ensure_torch_jit_script()
 
 from detectron2.checkpoint import DetectionCheckpointer
 from torchbenchmark.tasks import COMPUTER_VISION
