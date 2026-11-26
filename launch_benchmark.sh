@@ -129,7 +129,12 @@ function generate_core_launcher {
 }
 
 # download common files
-rm -rf oob-common && git clone https://github.com/intel-sandbox/oob-common.git -b gpu_oob
+# OOB_COMMON_DIR: pre-synced copy for hosts that cannot reach the internal repo
+if [ -n "${OOB_COMMON_DIR}" ] && [ -d "${OOB_COMMON_DIR}" ]; then
+    rm -rf oob-common && cp -r ${OOB_COMMON_DIR} oob-common
+else
+    rm -rf oob-common && git clone https://github.com/intel-sandbox/oob-common.git -b gpu_oob
+fi
 
 # Start
 main "$@"
